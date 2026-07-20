@@ -1,5 +1,6 @@
 #include "main.h"
 #include "four_bar.hpp"
+#include "AntiTip.hpp"
 
 /////
 // For installation, upgrading, documentations, and tutorials, check out our website!
@@ -18,6 +19,8 @@ ez::Drive chassis(
     3.25,  // Wheel Diameter (Remember, 4" wheels without screw holes are actually 4.125!)
     333);   // Wheel RPM = cartridge * (motor gear / wheel gear)
 
+pros::Imu imu_sensor(5); // whatever port your IMU is on
+AntiTip anti_tip(&imu_sensor, &chassis.drive_motors, 35, 15, 8000); // adjust chassis motor group reference to match EZ-Template's actual member name
 pros::Motor intake(8);
 pros::Motor four_bar_left(5);
 pros::Motor four_bar_right(6);  // reversed since it's mirrored on the other side
@@ -76,7 +79,7 @@ void initialize() {
 
   // Autonomous Selector using LLEMU
   ez::as::auton_selector.autons_add({
-      {"Drive\n\nDrive forward and come back", drive_example},
+      {"standard sawp", sawp},
       {"Turn\n\nTurn 3 times.", turn_example},
       {"Drive and Turn\n\nDrive forward, turn, come back", drive_and_turn},
       {"Drive and Turn\n\nSlow down during drive", wait_until_change_speed},
@@ -259,11 +262,15 @@ void ez_template_extras() {
  * task, not resume it from where it left off.
  */
 void opcontrol() {
-  // This is preference to what you like to drive on
   chassis.drive_brake_set(MOTOR_BRAKE_COAST);
 
   while (true) {
-    // Gives you some extras to make EZ-Template ezier
+    if (!anti_tip.should_override_drive()) {
+      chassis.opcontrol_arcade_standard(ez::SPLIT);  // only drives normally when NOT tipping
+    }
+    // if anti_tip IS active, it's already driving the motors in the background task —
+    // don't call any other drive function this loop
+
     ez_template_extras();
 
     // chassis.opcontrol_tank();  // Tank control
