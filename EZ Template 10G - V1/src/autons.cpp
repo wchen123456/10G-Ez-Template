@@ -1,6 +1,7 @@
 #include "main.h"
 #pragma once
 #include "four_bar.hpp"
+#include "AntiTip.hpp"
 
 
 extern FourBar four_bar;
@@ -56,7 +57,7 @@ void default_constants() {
 ///
 // Drive Example
 ///
-void drive_example() {
+void sawp() {
   // The first parameter is target inches
   // The second parameter is max speed the robot will drive at
   // The third parameter is a boolean (true or false) for enabling/disabling a slew at the start of drive motions
@@ -117,7 +118,7 @@ void drive_example() {
   chassis.pid_wait_quick_chain();
 //score
 
-  chassis.pid_drive_set(7_in, 127);
+  chassis.pid_drive_set(7_in, 127); //Start of Z
   chassis.pid_wait_quick_chain();
 
   chassis.pid_turn_set(135_deg, 127);
@@ -126,20 +127,37 @@ void drive_example() {
   chassis.pid_drive_set(-24_in, 127);
   chassis.pid_wait_quick_chain();
 
-  chassis.pid_turn_set(0, 127, ccw);
+  //clamp
+
+  chassis.pid_drive_set(24_in, 127); //Reverse Z
   chassis.pid_wait_quick_chain();
 
-  chassis.pid_drive_set(-15_in, 127);
-  chassis.pid_wait_quick_chain();
-  //score
-  chassis.pid_drive_set(8_in, 127);
+  chassis.pid_turn_set(-135_deg, 127);
   chassis.pid_wait_quick_chain(); 
 
-  chassis.pid_turn_set(-30_deg, 127);
+  chassis.pid_drive_set(-7_in, 127);
   chassis.pid_wait_quick_chain();
+  //score
 
-  chassis.pid_drive_set(-43_in, 127);
+  chassis.pid_drive_set(45_in, 127); //TUNE THIS MOVEMENT
   chassis.pid_wait_quick_chain();
+  //clamp
+
+
+  // chassis.pid_turn_set(0, 127, ccw); //Second half of Z
+  // chassis.pid_wait_quick_chain();
+
+  // chassis.pid_drive_set(-15_in, 127);
+  // chassis.pid_wait_quick_chain();
+  //score
+  // chassis.pid_drive_set(8_in, 127); //move forwards
+  // chassis.pid_wait_quick_chain(); 
+
+  // chassis.pid_turn_set(-30_deg, 127);
+  // chassis.pid_wait_quick_chain();
+
+  // chassis.pid_drive_set(-43_in, 127);
+  // chassis.pid_wait_quick_chain();
 
   chassis.pid_turn_set(43_deg, 127, cw);
   chassis.pid_wait_quick_chain();
